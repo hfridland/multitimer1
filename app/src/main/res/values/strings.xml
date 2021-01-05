@@ -1,0 +1,12 @@
+<resources>
+    <string name="app_name">Multi Timer</string>
+    <string name="start">Start</string>
+    <string name="stop">Stop</string>
+    <string name="edit">Edit</string>
+    <string name="about_descr">
+        \nTimer with unlimiter timer items\n
+        Written by Haim Fridland. I am looking for a job (or contract) as Android Developer. Currently I live in
+        Vancouver, Canada. I agree to relocate to Israel. You can contact me
+        <a href='mailto:hfridland@gmail.com'>hfridland@gmail.com</a>.\n&#169; 2020
+    </string>
+</resources>

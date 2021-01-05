@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/black"
+    tools:context=".ui.notifalarm.NotifAlarmActivity">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_above="@+id/tvTimerName"
+        android:textSize="35sp"
+        android:layout_marginBottom="5dp"
+        android:textColor="@color/teal_200"
+        android:textStyle="bold"
+        android:text="Time's up"/>
+
+    <TextView
+        android:id="@+id/tvTimerName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_above="@+id/btnClose"
+        android:textSize="25sp"
+        android:textColor="@color/teal_200"
+        android:textStyle="bold"
+        android:text="TimerName"/>
+
+    <Button
+        android:id="@+id/btnClose"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:layout_marginBottom="5dp"
+        android:layout_marginTop="5dp"
+        android:text="close"/>
+
+    <TextView
+        android:id="@+id/tvTime"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@+id/btnClose"
+        android:textSize="35sp"
+        android:textColor="@color/teal_200"
+        android:textStyle="bold"
+        android:text="00:00:00"/>
+
+
+</RelativeLayout>

@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <data class="TimerItemBinding">
+        <variable
+            name="timerItem"
+            type="com.hfridland.multitimernew.ui.timers.TimerItemViewModel" />
+        <variable
+            name="onTimerItemClickListener"
+            type="com.hfridland.multitimernew.ui.timers.TimersAdapter.OnTimerItemClickListener" />
+        <import
+            alias="V"
+            type="android.view.View" />
+    </data>
+
+    <androidx.cardview.widget.CardView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="8dp"
+        android:background="#FFF"
+        app:cardElevation="4dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/btn_start_stop"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:onClick="@{() -> onTimerItemClickListener.onStartStopClick(timerItem.id)}"
+                    android:text="@{timerItem.active ? @string/stop : @string/start}" />
+
+                <Button
+                     android:id="@+id/btn_edit"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:enabled="@{!timerItem.active}"
+                    android:onClick="@{() -> onTimerItemClickListener.onEditClick(timerItem.id)}"
+                    android:text="@string/edit" />
+
+
+                <Button
+                    android:id="@+id/btn_delete"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:enabled="@{!timerItem.active}"
+                    android:onClick="@{() -> onTimerItemClickListener.onDeleteClick(timerItem.id)}"
+                    android:text="Delete" />
+
+
+            </LinearLayout>
+
+            <ProgressBar
+                android:id="@+id/progressBar"
+                style="?android:attr/progressBarStyleHorizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+
+                android:max="@{timerItem.durationSec}"
+                android:min="0"
+                android:progress="@{timerItem.progress}"
+                android:visibility="@{timerItem.active ? V.VISIBLE : V.GONE}" />
+
+            <TextView
+                android:id="@+id/item_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:text="@{timerItem.name}" />
+
+            <TextView
+                android:id="@+id/item_duration"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:text="@{timerItem.duration}" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="#444" />
+        </LinearLayout>
+
+    </androidx.cardview.widget.CardView>
+
+</layout>
+
