@@ -33,6 +33,9 @@ public abstract class MultitimerDao {
     @Query("select * from timeritem where id = :id")
     public abstract TimerItem getTimerItemById(int id);
 
+    @Query("select * from timeritem where id = :id")
+    public abstract Single<TimerItem> getSingleTimerItemById(int id);
+
     @Transaction
     public TimerItem changeActive(int id) {
         TimerItem timerItem = getTimerItemById(id);

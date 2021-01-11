@@ -6,6 +6,7 @@ import static java.lang.Math.round;
 import static com.hfridland.multitimernew.utils.StringUtils.duration2String;
 
 public class TimerItemViewModel {
+
     private int mId;
     private String mName;
     private int mDurationSec;

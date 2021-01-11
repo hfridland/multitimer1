@@ -6,6 +6,8 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.media.AudioAttributes;
 import android.net.Uri;
 import android.os.Build;
@@ -16,6 +18,7 @@ import com.hfridland.multitimernew.data.database.MultitimerDao;
 import com.hfridland.multitimernew.data.model.TimerItem;
 import com.hfridland.multitimernew.ui.timers.TimersActivity;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -24,6 +27,9 @@ import java.util.concurrent.TimeUnit;
 import androidx.core.app.NotificationCompat;
 
 import com.hfridland.multitimernew.R;
+import com.hfridland.multitimernew.utils.StringUtils;
+
+import static java.lang.Math.round;
 
 public class TickService extends Service {
     public static final String ALARM_ACTION = "com.hfridland.multitimer.ticker.ALARM_ACTION";
@@ -73,22 +79,31 @@ public class TickService extends Service {
         }
     }
 
-    private Notification getNotification(String contentText){
+    private Notification getNotification(List<TimerItem> timerItems){
         Intent intent = new Intent(this, TimersActivity.class);
         intent.setAction("");
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        //intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, 0);
+
+        String contentText = !timerItems.isEmpty() ? "" + timerItems.size() + " active timers" : "";
+        NotificationCompat.InboxStyle inboxStyle = new NotificationCompat.InboxStyle()
+                .setBigContentTitle(contentText);
+        for(TimerItem ti : timerItems) {
+            int progress = (int)round((ti.getAlarmTime() - System.currentTimeMillis()) / 1000.0);
+            inboxStyle.addLine(ti.getName() + " " + StringUtils.duration2String(progress));
+        }
 
         return mBuilder.setContentText(contentText)
                 .setContentIntent(pendingIntent)
+                .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+                .setStyle(inboxStyle)
                 .build();
     }
 
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        startForeground(1, getNotification(""));
+        startForeground(1, getNotification(new ArrayList<>()));
 
         final MultitimerDao multitimerDao = AppDelegate.getMultitimerDao();
 
@@ -97,7 +112,7 @@ public class TickService extends Service {
             public void run() {
                 List<TimerItem> timerItems = multitimerDao.getActiveTimerItems();
                 if (!timerItems.isEmpty()) {
-                    mManager.notify(ACTIVETIMERS_NOTIFY, getNotification("" + timerItems.size() + " active timers" ));
+                    mManager.notify(ACTIVETIMERS_NOTIFY, getNotification(timerItems));
                     TimerItem expiredItem = null;
                     StringBuilder sb = new StringBuilder();
                     long t = System.currentTimeMillis();

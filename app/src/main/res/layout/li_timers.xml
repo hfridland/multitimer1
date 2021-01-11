@@ -27,6 +27,12 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
+            <android.widget.Toolbar
+                android:id="@+id/tbItem"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:title="@{timerItem.name}"/>
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -76,6 +82,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center_horizontal"
+                android:textSize="24sp"
                 android:text="@{timerItem.name}" />
 
             <TextView
@@ -83,6 +90,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center_horizontal"
+                android:textSize="24sp"
                 android:text="@{timerItem.duration}" />
 
             <View

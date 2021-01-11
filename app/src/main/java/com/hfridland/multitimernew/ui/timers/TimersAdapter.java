@@ -1,7 +1,9 @@
 package com.hfridland.multitimernew.ui.timers;
 
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.ViewGroup;
+import android.widget.Toolbar;
 
 import com.hfridland.multitimernew.AppDelegate;
 import com.hfridland.multitimernew.data.database.MultitimerDao;
@@ -16,6 +18,8 @@ import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
+
+import com.hfridland.multitimernew.R;
 
 
 
@@ -35,6 +39,7 @@ public class TimersAdapter extends RecyclerView.Adapter<TimersHolder> {
     public TimersHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
         TimerItemBinding binding = TimerItemBinding.inflate(inflater, parent, false);
+        binding.tbItem.inflateMenu(R.menu.mn_timeritem);
         return new TimersHolder(binding);
     }
 
@@ -42,6 +47,7 @@ public class TimersAdapter extends RecyclerView.Adapter<TimersHolder> {
     public void onBindViewHolder(@NonNull TimersHolder holder, int position) {
         TimerItem timerItem = mTimerItems.get(position);
         holder.bind(timerItem, mOnTimerItemClickListener);
+        holder.setupMenu();
     }
 
     @Override
@@ -66,5 +72,4 @@ public class TimersAdapter extends RecyclerView.Adapter<TimersHolder> {
         void onEditClick(int id);
         void onDeleteClick(int id);
     }
-
 }

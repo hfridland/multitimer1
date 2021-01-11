@@ -1,7 +1,8 @@
 package com.hfridland.multitimernew.ui.timers;
 
-import android.app.NotificationManager;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
@@ -80,12 +81,20 @@ public class TimersFragment extends Fragment implements TimeEditorDialogFragment
 
         @Override
         public void onDeleteClick(int id) {
-            Single.fromCallable(() -> mMultitimerDao.deleteTimerItem(id))
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(n -> {
-                    mTimersAdapter.updateData();
-                });
+            mMultitimerDao.getSingleTimerItemById(id)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(timerItem -> {
+                        new AlertDialog.Builder(getActivity())
+                                .setMessage("Are you really want to delete timer item " + timerItem.getName() + "?")
+                                .setPositiveButton("Yes", (dialogInterface, i) -> Single.fromCallable(() -> mMultitimerDao.deleteTimerItem(id))
+                                        .subscribeOn(Schedulers.io())
+                                        .observeOn(AndroidSchedulers.mainThread())
+                                        .subscribe(n -> {
+                                            mTimersAdapter.updateData();
+                                        }))
+                                .setNegativeButton("No", null).create().show();
+                    });
         }
     };
 
