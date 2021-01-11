@@ -53,7 +53,7 @@ public class AlarmNotifHelper {
     public void showNotification(Context context, TimerItem timerItem) {
         String title  = "Time's up";
         mItems.add(timerItem);
-        String description = mItems.get(0).getName();
+        String description = mItems.get(0).getName(); 
         if (mItems.size() > 1) {
             description += "...";
         }
