@@ -15,7 +15,14 @@ import android.os.Vibrator;
 import androidx.core.app.NotificationCompat;
 
 import com.hfridland.multitimernew.R;
+import com.hfridland.multitimernew.data.model.TimerItem;
 import com.hfridland.multitimernew.ui.notifalarm.NotifAlarmActivity;
+import com.hfridland.multitimernew.utils.StringUtils;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import static java.lang.Math.round;
 
 public class AlarmNotifHelper {
     private static AlarmNotifHelper mAlarmNotifHelper = null;
@@ -39,20 +46,34 @@ public class AlarmNotifHelper {
     private boolean mSpeakerphoneOn;
 
     private boolean running = false;
-    private String mDescription = "";
+    //private String mDescription = "";
 
-    public void showNotification(Context context, String timerName) {
+    private List<TimerItem> mItems = new ArrayList<>();
+
+    public void showNotification(Context context, TimerItem timerItem) {
         String title  = "Time's up";
-        mDescription = mDescription.isEmpty() ? timerName : mDescription + " | " + timerName;
+        mItems.add(timerItem);
+        String description = mItems.get(0).getName();
+        if (mItems.size() > 1) {
+            description += "...";
+        }
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, CHANNEL_ID)
                 .setSmallIcon(android.R.drawable.arrow_up_float)
                 .setContentTitle(title)
-                .setContentText(mDescription)
+                .setContentText(description)
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
-                .setFullScreenIntent(getFullScreenIntent(context, timerName), true)
-                .addAction(R.drawable.ic_launcher_foreground, "Dismiss", getFullScreenIntent(context, timerName))
+                .setFullScreenIntent(getFullScreenIntent(context, timerItem.getName()), true)
+                .addAction(R.drawable.ic_launcher_foreground, "Dismiss", getFullScreenIntent(context, timerItem.getName()))
                 .setOngoing(true);
+        if (mItems.size() > 1) {
+            NotificationCompat.InboxStyle inboxStyle = new NotificationCompat.InboxStyle()
+                    .setBigContentTitle("Time's Up");
+            for(TimerItem ti : mItems) {
+                inboxStyle.addLine(ti.getName());
+            }
+            builder.setStyle(inboxStyle);
+        }
 
         NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         buildChannel(context, notificationManager);
@@ -65,12 +86,15 @@ public class AlarmNotifHelper {
 
     private void buildChannel(Context context, NotificationManager notificationManager) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            String name = "Example Notification Channel";
-            String descriptionText = "This is used to demonstrate the Full Screen Intent";
-            int importance = NotificationManager.IMPORTANCE_HIGH;
-            NotificationChannel channel = new NotificationChannel(CHANNEL_ID, name, importance);
-            channel.setDescription(descriptionText);
-            notificationManager.createNotificationChannel(channel);
+            NotificationManager nm = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+            if(nm.getNotificationChannel(CHANNEL_ID) == null) {
+                String name = "Example Notification Channel";
+                String descriptionText = "This is used to demonstrate the Full Screen Intent";
+                int importance = NotificationManager.IMPORTANCE_HIGH;
+                NotificationChannel channel = new NotificationChannel(CHANNEL_ID, name, importance);
+                channel.setDescription(descriptionText);
+                notificationManager.createNotificationChannel(channel);
+            }
         }
     }
 
@@ -105,7 +129,7 @@ public class AlarmNotifHelper {
 
     public void stopVibSound(Context context) {
         running = false;
-        mDescription = "";
+        mItems.clear();
         NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         notificationManager.cancel(NOTIFICATION_ID);
         mVibrator.cancel();

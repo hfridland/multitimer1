@@ -79,7 +79,7 @@ public class TickService extends Service {
         }
     }
 
-    private Notification getNotification(List<TimerItem> timerItems){
+    private Notification getNotification(List<TimerItem> timerItems) {
         Intent intent = new Intent(this, TimersActivity.class);
         intent.setAction("");
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -129,7 +129,7 @@ public class TickService extends Service {
                         multitimerDao.insertTimerItem(expiredItem);
 
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                            AlarmNotifHelper.get().showNotification(TickService.this, expiredItem.getName());
+                            AlarmNotifHelper.get().showNotification(TickService.this, expiredItem);
                         } else {
                             Intent intentAlarm = new Intent(TickService.this, TimersActivity.class);
                             intentAlarm.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);

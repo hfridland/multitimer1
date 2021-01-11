@@ -33,38 +33,12 @@
                 android:layout_height="wrap_content"
                 android:title="@{timerItem.name}"/>
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center_horizontal"
-                android:orientation="horizontal">
-
                 <Button
                     android:id="@+id/btn_start_stop"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:onClick="@{() -> onTimerItemClickListener.onStartStopClick(timerItem.id)}"
                     android:text="@{timerItem.active ? @string/stop : @string/start}" />
-
-                <Button
-                     android:id="@+id/btn_edit"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:enabled="@{!timerItem.active}"
-                    android:onClick="@{() -> onTimerItemClickListener.onEditClick(timerItem.id)}"
-                    android:text="@string/edit" />
-
-
-                <Button
-                    android:id="@+id/btn_delete"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:enabled="@{!timerItem.active}"
-                    android:onClick="@{() -> onTimerItemClickListener.onDeleteClick(timerItem.id)}"
-                    android:text="Delete" />
-
-
-            </LinearLayout>
 
             <ProgressBar
                 android:id="@+id/progressBar"
@@ -76,14 +50,6 @@
                 android:min="0"
                 android:progress="@{timerItem.progress}"
                 android:visibility="@{timerItem.active ? V.VISIBLE : V.GONE}" />
-
-            <TextView
-                android:id="@+id/item_name"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center_horizontal"
-                android:textSize="24sp"
-                android:text="@{timerItem.name}" />
 
             <TextView
                 android:id="@+id/item_duration"
