@@ -5,9 +5,9 @@
     <application
         android:name=".AppDelegate"
         android:allowBackup="true"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@mipmap/ic_multitimer"
         android:label="@string/app_name"
-        android:roundIcon="@mipmap/ic_launcher_round"
+        android:roundIcon="@mipmap/ic_multitimer"
         android:supportsRtl="true"
         android:theme="@style/Theme.MultiTimerNew">
         <activity android:name=".ui.timers.TimersActivity">
