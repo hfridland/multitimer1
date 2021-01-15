@@ -1,12 +1,8 @@
 package com.hfridland.multitimernew.ui.timers;
 
 import android.app.AlertDialog;
-import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.os.Bundle;
-import android.os.PowerManager;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -17,10 +13,8 @@ import android.view.ViewGroup;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.hfridland.multitimernew.AppDelegate;
 import com.hfridland.multitimernew.data.database.MultitimerDao;
-import com.hfridland.multitimernew.data.model.TimerItem;
 import com.hfridland.multitimernew.service.TickService;
 import com.hfridland.multitimernew.ui.about.AboutActivity;
-import com.hfridland.multitimernew.ui.alarm.AlarmActivity;
 import com.hfridland.multitimernew.ui.dialogs.TimeEditorDialogFragment;
 
 import java.util.concurrent.TimeUnit;
@@ -99,10 +93,6 @@ public class TimersFragment extends Fragment implements TimeEditorDialogFragment
     };
 
     private Disposable mTimerDisposable;
-    private IntentFilter mIntentFilter;
-
-    private PowerManager mPowerManager;
-    PowerManager.WakeLock  mWakeLock;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -117,11 +107,6 @@ public class TimersFragment extends Fragment implements TimeEditorDialogFragment
                     getActivity().startService(intent);
                 }
             });
-
-        mPowerManager = (PowerManager) getActivity().getSystemService(Context.POWER_SERVICE);
-        mWakeLock = mPowerManager.newWakeLock(PowerManager.FULL_WAKE_LOCK |
-                PowerManager.ACQUIRE_CAUSES_WAKEUP |
-                PowerManager.ON_AFTER_RELEASE, "appname::WakeLock");
 
         mTimerDisposable = Observable.interval(500, TimeUnit.MILLISECONDS)
                 .subscribeOn(Schedulers.io())
@@ -196,21 +181,6 @@ public class TimersFragment extends Fragment implements TimeEditorDialogFragment
             Intent intent = getActivity().getIntent();
             if (intent.getAction().equals("UpdateAdapterData")) {
                 mTimersAdapter.updateData();
-            }
-            if (intent.getAction().equals(TickService.ALARM_ACTION)) {
-                TimerItem expiredItem = (TimerItem) intent.getSerializableExtra(TickService.TIMER_ITEM);
-                Intent wakeIntent = new Intent(getActivity(), AlarmActivity.class);
-                wakeIntent.putExtra("NAME", expiredItem.getName());
-                startActivity(wakeIntent);
-                mMultitimerDao.getActiveTimerItemsRx()
-                        .subscribeOn(Schedulers.io())
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe(timerItems -> {
-                            if (timerItems.isEmpty()) {
-                                Intent intentClose = new Intent(getContext(), TickService.class);
-                                getActivity().stopService(intentClose);
-                            }
-                        });
             }
         }
     }

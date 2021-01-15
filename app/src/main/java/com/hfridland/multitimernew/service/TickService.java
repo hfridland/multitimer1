@@ -38,6 +38,7 @@ public class TickService extends Service {
     public static final String ALARMNOTIFY_ACTION = "CHANNEL_ALARM";
     public static final int ACTIVETIMERS_NOTIFY = 1;
     public static final int ALARM_NOTIFY = 2;
+    public static final int NOTIFICATION_ID = 1;
 
 
     private ScheduledExecutorService mScheduledExecutorService;
@@ -103,7 +104,7 @@ public class TickService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        startForeground(1, getNotification(new ArrayList<>()));
+        startForeground(NOTIFICATION_ID, getNotification(new ArrayList<>()));
 
         final MultitimerDao multitimerDao = AppDelegate.getMultitimerDao();
 
@@ -128,15 +129,6 @@ public class TickService extends Service {
                         multitimerDao.insertTimerItem(expiredItem);
 
                         AlarmNotifHelper.get().showNotification(TickService.this, expiredItem);
-//                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-//                            AlarmNotifHelper.get().showNotification(TickService.this, expiredItem);
-//                        } else {
-//                            Intent intentAlarm = new Intent(TickService.this, TimersActivity.class);
-//                            intentAlarm.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-//                            intentAlarm.setAction(ALARM_ACTION);
-//                            intentAlarm.putExtra(TIMER_ITEM, expiredItem);
-//                            startActivity(intentAlarm);
-//                        }
                     }
                 }
             }
@@ -147,7 +139,7 @@ public class TickService extends Service {
 
     @Override
     public void onDestroy() {
-        mManager.cancel(1);
+        mManager.cancel(NOTIFICATION_ID);
         stopForeground(true);
         mScheduledExecutorService.shutdownNow();
     }

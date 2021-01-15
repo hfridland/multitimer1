@@ -36,8 +36,7 @@ public class AlarmNotifHelper {
     private AlarmNotifHelper() { }
 
     private static final String CHANNEL_ID = "AlarmNotifchannelId";
-    public static final int NOTIFICATION_ID = 3;
-    public static final int START_NOTIFICATION_ID = 3;
+    private static final int START_NOTIFICATION_ID = 3;
 
     private static int CUR_NOTIFICATION_ID = START_NOTIFICATION_ID;
 
@@ -68,8 +67,8 @@ public class AlarmNotifHelper {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationManager nm = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
             if(nm.getNotificationChannel(CHANNEL_ID) == null) {
-                String name = "Example Notification Channel";
-                String descriptionText = "This is used to demonstrate the Full Screen Intent";
+                String name = "Alarm Notification Channel";
+                String descriptionText = "Alarm Notification Channel";
                 int importance = NotificationManager.IMPORTANCE_HIGH;
                 NotificationChannel channel = new NotificationChannel(CHANNEL_ID, name, importance);
                 channel.setDescription(descriptionText);
@@ -84,7 +83,6 @@ public class AlarmNotifHelper {
         intent.putExtra("timerName", timerName);
         intent.putExtra("notificationId", notificationId);
 
-        // flags and request code are 0 for the purpose of demonstration
         return PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_CANCEL_CURRENT);
     }
 

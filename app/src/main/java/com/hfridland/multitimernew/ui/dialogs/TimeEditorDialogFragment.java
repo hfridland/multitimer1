@@ -67,7 +67,6 @@ public class TimeEditorDialogFragment extends DialogFragment {
         View v = inflater.inflate(R.layout.dlg_timereditor, null);
         setupView(v);
         builder.setView(v)
-                //.setCancelable(false)
                 .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
