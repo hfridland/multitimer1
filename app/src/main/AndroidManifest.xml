@@ -22,21 +22,27 @@
         <activity android:name=".ui.about.AboutActivity" />
         <activity android:name=".ui.notifalarm.NotifAlarmActivity" />
         <receiver
-            android:name=".service.AlarmReceiver"
+            android:name=".service.NewAlarmReceiver"
             android:enabled="true"
             android:exported="true"></receiver>
+
+        <receiver
+            android:name=".service.AlarmReceiver"
+            android:enabled="true"
+            android:exported="true" />
 
         <service
             android:name=".service.TickService"
             android:enabled="true"
             android:exported="true" />
     </application>
-    <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.DISABLE_KEYGUARD" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
-
     <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
     <uses-permission android:name="android.permission.USE_FULL_SCREEN_INTENT" />
+
+    <uses-permission android:name="android.permission.VIBRATE" />
+
 </manifest>

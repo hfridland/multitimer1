@@ -12,9 +12,4 @@ public class TimersActivity extends SingleFragmentActivity {
     protected Fragment getFragment() {
         return TimersFragment.newInstance();
     }
-
-    @Override
-    protected void onNewIntent(Intent intent) {
-        super.onNewIntent(intent);
-    }
 }

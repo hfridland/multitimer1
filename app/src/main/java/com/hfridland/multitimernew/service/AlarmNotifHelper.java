@@ -37,51 +37,31 @@ public class AlarmNotifHelper {
 
     private static final String CHANNEL_ID = "AlarmNotifchannelId";
     public static final int NOTIFICATION_ID = 3;
+    public static final int START_NOTIFICATION_ID = 3;
 
-    private Vibrator mVibrator = null;
-    private static MediaPlayer mMediaPlayer;
-
-    AudioManager mAudioManager;
-    private int mAudioManagerMode;
-    private boolean mSpeakerphoneOn;
-
-    private boolean running = false;
-    //private String mDescription = "";
-
-    private List<TimerItem> mItems = new ArrayList<>();
+    private static int CUR_NOTIFICATION_ID = START_NOTIFICATION_ID;
 
     public void showNotification(Context context, TimerItem timerItem) {
         String title  = "Time's up";
-        mItems.add(timerItem);
-        String description = mItems.get(0).getName();
-        if (mItems.size() > 1) {
-            description += "...";
-        }
+        String description = timerItem.getName();
+
+        PendingIntent fullScreenIntent = getFullScreenIntent(context, timerItem.getName(), CUR_NOTIFICATION_ID);
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, CHANNEL_ID)
                 .setSmallIcon(android.R.drawable.arrow_up_float)
                 .setContentTitle(title)
                 .setContentText(description)
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
-                .setFullScreenIntent(getFullScreenIntent(context, timerItem.getName()), true)
-                .addAction(R.drawable.ic_launcher_foreground, "Dismiss", getFullScreenIntent(context, timerItem.getName()))
+                .setFullScreenIntent(fullScreenIntent, true)
+                .addAction(R.drawable.ic_launcher_foreground, "Dismiss", fullScreenIntent)
                 .setOngoing(true);
-        if (mItems.size() > 1) {
-            NotificationCompat.InboxStyle inboxStyle = new NotificationCompat.InboxStyle()
-                    .setBigContentTitle("Time's Up");
-            for(TimerItem ti : mItems) {
-                inboxStyle.addLine(ti.getName());
-            }
-            builder.setStyle(inboxStyle);
-        }
 
         NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         buildChannel(context, notificationManager);
         Notification notification = builder.build();
-        notificationManager.notify(NOTIFICATION_ID, notification);
-        if (!running) {
-            startVibSound(context);
-        }
+        notificationManager.notify(CUR_NOTIFICATION_ID, notification);
+        CUR_NOTIFICATION_ID++;
+        startVibSound(context);
     }
 
     private void buildChannel(Context context, NotificationManager notificationManager) {
@@ -98,46 +78,58 @@ public class AlarmNotifHelper {
         }
     }
 
-    private PendingIntent getFullScreenIntent(Context context, String timerName)  {
+    private PendingIntent getFullScreenIntent(Context context, String timerName, int notificationId)  {
         Intent intent = new Intent(context, NotifAlarmActivity.class);
-        intent.setAction("StopNotification");
+        intent.setAction("StopNotification" + notificationId);
         intent.putExtra("timerName", timerName);
+        intent.putExtra("notificationId", notificationId);
 
         // flags and request code are 0 for the purpose of demonstration
-        return PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        return PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_CANCEL_CURRENT);
     }
+
+    int count = 0;
+    private static Vibrator mVibrator = null;
+    private static MediaPlayer mMediaPlayer;
+
+    private static AudioManager mAudioManager;
+    private static int mAudioManagerMode;
+    private static boolean mSpeakerphoneOn;
 
     private void startVibSound(Context context) {
-        running = true;
-        mVibrator = (Vibrator) context.getSystemService(Context.VIBRATOR_SERVICE);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            mVibrator.vibrate(VibrationEffect.createWaveform(new long[]{0, 1000, 1000}, 1));
-        } else {
-            mVibrator.vibrate(new long[]{0, 1000, 1000}, 1);
+        if (count == 0) {
+            mVibrator = (Vibrator) context.getSystemService(Context.VIBRATOR_SERVICE);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                mVibrator.vibrate(VibrationEffect.createWaveform(new long[]{0, 1000, 1000}, 1));
+            } else {
+                mVibrator.vibrate(new long[]{0, 1000, 1000}, 1);
+            }
+
+            mAudioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
+            mAudioManagerMode = mAudioManager.getMode();
+            mSpeakerphoneOn = mAudioManager.isSpeakerphoneOn();
+            mAudioManager.setMode(AudioManager.STREAM_MUSIC);
+            mAudioManager.setSpeakerphoneOn(true);
+
+            mMediaPlayer = MediaPlayer.create(context, R.raw.alarm_clock_digital);
+            mMediaPlayer.setLooping(true);
+            mMediaPlayer.start();
         }
-
-        mAudioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
-        mAudioManagerMode = mAudioManager.getMode();
-        mSpeakerphoneOn = mAudioManager.isSpeakerphoneOn();
-        mAudioManager.setMode(AudioManager.STREAM_MUSIC);
-        mAudioManager.setSpeakerphoneOn(true);
-
-        mMediaPlayer = MediaPlayer.create(context, R.raw.alarm_clock_digital);
-        mMediaPlayer.setLooping(true);
-        mMediaPlayer.start();
+        count++;
     }
 
-    public void stopVibSound(Context context) {
-        running = false;
-        mItems.clear();
+    public void stopVibSound(Context context, int notificationId) {
         NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-        notificationManager.cancel(NOTIFICATION_ID);
-        mVibrator.cancel();
+        notificationManager.cancel(notificationId);
+        count--;
+        if (count == 0) {
+            mVibrator.cancel();
 
-        mMediaPlayer.pause();
-        mMediaPlayer.stop();
+            mMediaPlayer.pause();
+            mMediaPlayer.stop();
 
-        mAudioManager.setMode(mAudioManagerMode);
-        mAudioManager.setSpeakerphoneOn(mSpeakerphoneOn);
+            mAudioManager.setMode(mAudioManagerMode);
+            mAudioManager.setSpeakerphoneOn(mSpeakerphoneOn);
+        }
     }
 }

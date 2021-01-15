@@ -123,20 +123,20 @@ public class TickService extends Service {
                         }
                     }
 
-
                     if (expiredItem != null) {
                         expiredItem.setActive(false);
                         multitimerDao.insertTimerItem(expiredItem);
 
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                            AlarmNotifHelper.get().showNotification(TickService.this, expiredItem);
-                        } else {
-                            Intent intentAlarm = new Intent(TickService.this, TimersActivity.class);
-                            intentAlarm.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                            intentAlarm.setAction(ALARM_ACTION);
-                            intentAlarm.putExtra(TIMER_ITEM, expiredItem);
-                            startActivity(intentAlarm);
-                        }
+                        AlarmNotifHelper.get().showNotification(TickService.this, expiredItem);
+//                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+//                            AlarmNotifHelper.get().showNotification(TickService.this, expiredItem);
+//                        } else {
+//                            Intent intentAlarm = new Intent(TickService.this, TimersActivity.class);
+//                            intentAlarm.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+//                            intentAlarm.setAction(ALARM_ACTION);
+//                            intentAlarm.putExtra(TIMER_ITEM, expiredItem);
+//                            startActivity(intentAlarm);
+//                        }
                     }
                 }
             }
@@ -147,7 +147,7 @@ public class TickService extends Service {
 
     @Override
     public void onDestroy() {
-        mManager.cancelAll();
+        mManager.cancel(1);
         stopForeground(true);
         mScheduledExecutorService.shutdownNow();
     }

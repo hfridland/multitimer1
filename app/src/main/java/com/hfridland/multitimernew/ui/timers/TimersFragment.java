@@ -194,6 +194,9 @@ public class TimersFragment extends Fragment implements TimeEditorDialogFragment
 
         if (getActivity() != null) {
             Intent intent = getActivity().getIntent();
+            if (intent.getAction().equals("UpdateAdapterData")) {
+                mTimersAdapter.updateData();
+            }
             if (intent.getAction().equals(TickService.ALARM_ACTION)) {
                 TimerItem expiredItem = (TimerItem) intent.getSerializableExtra(TickService.TIMER_ITEM);
                 Intent wakeIntent = new Intent(getActivity(), AlarmActivity.class);

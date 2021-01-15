@@ -37,10 +37,22 @@ public class NotifAlarmActivity extends AppCompatActivity {
 
     private final MultitimerDao mMultitimerDao = AppDelegate.getMultitimerDao();
 
+    private int mNotificationId;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_alarm_notif);
+
+        mTvTimerName = findViewById(R.id.tvTimerName);
+        String timerName = "";
+        Intent intent = getIntent();
+        if (intent != null) {
+            timerName = intent.getStringExtra("timerName");
+            mTvTimerName.setText(timerName);
+            mNotificationId = intent.getIntExtra("notificationId", -1);
+        }
+
 
         KeyguardManager km = (KeyguardManager) getSystemService(Context.KEYGUARD_SERVICE);
         boolean locked = km.inKeyguardRestrictedInputMode();
@@ -53,14 +65,6 @@ public class NotifAlarmActivity extends AppCompatActivity {
                 | WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON
                 | WindowManager.LayoutParams.FLAG_FULLSCREEN;
         getWindow().addFlags(flags);
-
-        mTvTimerName = findViewById(R.id.tvTimerName);
-        String timerName = "";
-        Intent intent = getIntent();
-        if (intent != null) {
-            timerName = intent.getStringExtra("timerName");
-            mTvTimerName.setText(timerName);
-        }
 
         mBtnClose = findViewById(R.id.btnClose);
         mBtnClose.setOnClickListener(new View.OnClickListener() {
@@ -87,7 +91,7 @@ public class NotifAlarmActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        AlarmNotifHelper.get().stopVibSound(this);
+        AlarmNotifHelper.get().stopVibSound(this, mNotificationId);
         mTimerDisposable.dispose();
         mMultitimerDao.getActiveTimerItemsRx()
                 .subscribeOn(Schedulers.io())
@@ -100,7 +104,8 @@ public class NotifAlarmActivity extends AppCompatActivity {
                 });
 
         Intent intent = new Intent(this, TimersActivity.class);
-        intent.setAction("");
+        intent.setAction("UpdateAdapterData");
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(intent);
     }
 }
