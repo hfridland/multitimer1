@@ -51,13 +51,17 @@ public class AlarmNotifHelper {
                 .setContentTitle(title)
                 .setContentText(description)
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
+                .setCategory(Notification.CATEGORY_MESSAGE)
                 .setFullScreenIntent(fullScreenIntent, true)
                 .addAction(R.drawable.ic_launcher_foreground, "Dismiss", fullScreenIntent)
-                .setOngoing(true);
+                .setOngoing(true)
+                .setVisibility(NotificationCompat.VISIBILITY_SECRET);
 
         NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         buildChannel(context, notificationManager);
         Notification notification = builder.build();
+        notification.flags |= Notification.FLAG_NO_CLEAR
+                | Notification.FLAG_ONGOING_EVENT;
         notificationManager.notify(CUR_NOTIFICATION_ID, notification);
         CUR_NOTIFICATION_ID++;
         startVibSound(context);
@@ -83,7 +87,8 @@ public class AlarmNotifHelper {
         intent.putExtra("timerName", timerName);
         intent.putExtra("notificationId", notificationId);
 
-        return PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_CANCEL_CURRENT);
+        //return PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_CANCEL_CURRENT);
+        return PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
     }
 
     int count = 0;

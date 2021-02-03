@@ -4,6 +4,7 @@ import android.app.KeyguardManager;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.telephony.TelephonyManager;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
@@ -16,6 +17,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 
+import com.google.android.material.button.MaterialButton;
 import com.hfridland.multitimernew.AppDelegate;
 import com.hfridland.multitimernew.R;
 import com.hfridland.multitimernew.data.database.MultitimerDao;
@@ -27,11 +29,11 @@ import com.hfridland.multitimernew.utils.StringUtils;
 import java.util.concurrent.TimeUnit;
 
 public class NotifAlarmActivity extends AppCompatActivity {
-    private Button mBtnClose;
+    private MaterialButton mBtnClose;
     private TextView mTvTimerName;
     private TextView mTvTime;
 
-    private Disposable mTimerDisposable;
+    private Disposable mTimerDisposable = null;
     private long mCurMill = System.currentTimeMillis();
     private int mCnt = 0;
 
@@ -54,10 +56,12 @@ public class NotifAlarmActivity extends AppCompatActivity {
         }
 
 
+        TelephonyManager telephonyManager = (TelephonyManager) getSystemService(TELEPHONY_SERVICE);
         KeyguardManager km = (KeyguardManager) getSystemService(Context.KEYGUARD_SERVICE);
-        boolean locked = km.inKeyguardRestrictedInputMode();
+        boolean locked = km.inKeyguardRestrictedInputMode() || telephonyManager.getCallState() > 0;
         if (!locked) {
             finish();
+            closeResources();
         }
 
         int flags = WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED
@@ -66,11 +70,13 @@ public class NotifAlarmActivity extends AppCompatActivity {
                 | WindowManager.LayoutParams.FLAG_FULLSCREEN;
         getWindow().addFlags(flags);
 
+
         mBtnClose = findViewById(R.id.btnClose);
         mBtnClose.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 finish();
+                closeResources();
             }
         });
 
@@ -86,13 +92,15 @@ public class NotifAlarmActivity extends AppCompatActivity {
                     mTvTime.setVisibility(mCnt % 2 == 0 ? View.VISIBLE : View.INVISIBLE);
                     mCnt++;
                 });
+
+
     }
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
+    private void closeResources() {
         AlarmNotifHelper.get().stopVibSound(this, mNotificationId);
-        mTimerDisposable.dispose();
+        if (mTimerDisposable != null) {
+            mTimerDisposable.dispose();
+        }
         mMultitimerDao.getActiveTimerItemsRx()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -108,4 +116,5 @@ public class NotifAlarmActivity extends AppCompatActivity {
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(intent);
     }
+
 }
